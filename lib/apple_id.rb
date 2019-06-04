@@ -1,6 +1,8 @@
-require "apple_id/version"
+require 'openid_connect'
 
 module AppleID
-  class Error < StandardError; end
-  # Your code goes here...
+  ISSUER = 'https://appleid.apple.com'
 end
+
+require 'apple_id/version'
+require 'apple_id/client'
