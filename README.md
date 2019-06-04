@@ -24,10 +24,15 @@ Or install it yourself as:
 
 ## Usage
 
+There is [a sample rails app](https://github.com/nov/signin-with-apple) running at [signin-with-apple.herokuapp.com](https://signin-with-apple.herokuapp.com).
+
+If you run script in your terminal only, do like below.
+
 ```ruby
 require 'apple_id'
 
-AppleID.debug!
+# NOTE: in debugging mode, you can see all HTTPS request & response in the log.
+# AppleID.debug!
 
 pem = <<-PEM
 -----BEGIN PRIVATE KEY-----
