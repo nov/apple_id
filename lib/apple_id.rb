@@ -1,6 +1,6 @@
 require "apple_id/version"
 
-module AppleId
+module AppleID
   class Error < StandardError; end
   # Your code goes here...
 end

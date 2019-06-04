@@ -1,3 +1,3 @@
-module AppleId
-  VERSION = "0.1.0"
+module AppleID
+  VERSION = "0.0.0"
 end
