@@ -1,8 +1,10 @@
 # AppleID
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/apple_id`. To experiment with that code, run `bin/console` for an interactive prompt.
+"Sign-in with Apple" is an implementation of OpenID Connect with small custom features.
 
-TODO: Delete this and the text above, and describe your gem
+This gem handles such custom features.
+
+Basically, this gem is based on my [OpenID Connect gem](https://github.com/nov/openid_connect) and [OAuth2 gem](https://github.com/nov/rack-oauth2), so the usage is almost same with them.
 
 ## Installation
 
@@ -22,7 +24,41 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+require 'apple_id'
+
+AppleID.debug!
+
+pem = <<-PEM
+-----BEGIN PRIVATE KEY-----
+  :
+  :
+-----END PRIVATE KEY-----
+PEM
+private_key = OpenSSL::PKey::EC.new pem
+
+client = AppleID::Client.new(
+  identifier: '<YOUR-CLIENT-ID>',
+  team_id: '<YOUR-TEAM-ID>',
+  key_id: '<YOUR-KEY-ID>',
+  private_key: private_key,
+  redirect_uri: '<YOUR-REDIRECT-URI>'
+)
+
+authorization_uri = client.authorization_uri(scope: [:email, :name])
+puts authorization_uri
+`open "#{authorization_uri}"`
+
+print 'code: ' and STDOUT.flush
+code = gets.chop
+
+client.authorization_code = code
+response = client.access_token!
+
+# NOTE: you can skip ID Token signature verification when you got the token directly from the token endpoint in TLS channel.
+id_token = JSON::JWT.decode(response.id_token, :skip_verification)
+puts id_token.pretty_generate
+```
 
 ## Development
 
