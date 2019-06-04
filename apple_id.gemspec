@@ -1,10 +1,6 @@
-lib = File.expand_path('../lib', __FILE__)
-$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'apple_id/version'
-
 Gem::Specification.new do |spec|
   spec.name          = 'apple_id'
-  spec.version       = AppleID::VERSION
+  spec.version       = File.read('VERSION')
   spec.authors       = ['nov']
   spec.email         = ['nov@matake.jp']
 
