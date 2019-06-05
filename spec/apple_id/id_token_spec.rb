@@ -54,7 +54,7 @@ RSpec.describe AppleID::IdToken do
       it do
         expect do
           travel_to(Time.at id_token.iat) do
-            id_token.verify! expected_client, :skip_signature_verification
+            id_token.verify! expected_client, verify_signature: false
           end
         end.not_to raise_error
       end
@@ -64,7 +64,7 @@ RSpec.describe AppleID::IdToken do
       it do
         expect do
           travel_to(Time.at id_token.iat) do
-            id_token.verify! unexpected_client, :skip_signature_verification
+            id_token.verify! unexpected_client, verify_signature: false
           end
         end.to raise_error AppleID::IdToken::VerificationFailed, 'Claims Verification Failed'
       end
@@ -75,11 +75,11 @@ RSpec.describe AppleID::IdToken do
         [signature_base_string, invalid_signature].join('.')
       end
 
-      context 'when skip_signature_verification is given' do
+      context 'when verify_signature=false is given' do
         it do
           expect do
             travel_to(Time.at id_token.iat) do
-              id_token.verify! expected_client, :skip_signature_verification
+              id_token.verify! expected_client, verify_signature: false
             end
           end.not_to raise_error
         end

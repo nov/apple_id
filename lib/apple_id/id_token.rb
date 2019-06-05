@@ -2,9 +2,9 @@ module AppleID
   class IdToken < OpenIDConnect::ResponseObject::IdToken
     class VerificationFailed < StandardError; end
 
-    def verify!(expected_client, skip_signature_verification = false)
-      verify_signature! unless skip_signature_verification
-      verify_claims! expected_client
+    def verify!(expected_client, access_token: nil, code: nil, verify_signature: true)
+      verify_signature! if verify_signature
+      verify_claims! expected_client, access_token, code
       self
     end
 
@@ -29,7 +29,8 @@ module AppleID
       raise VerificationFailed, 'Signature Verification Failed'
     end
 
-    def verify_claims!(expected_client)
+    def verify_claims!(expected_client, access_token, code)
+      # TODO: verify at_hash & c_hash
       unless (
         iss == ISSUER &&
         aud == expected_client.identifier &&
