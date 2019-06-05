@@ -1,12 +1,13 @@
 module AppleID
   class Client < OpenIDConnect::Client
+    class Error < Rack::OAuth2::Client::Error; end
+
     attr_required :team_id, :key_id, :private_key
 
     def initialize(attributes)
       attributes_with_default = {
-        host: 'appleid.apple.com',
-        authorization_endpoint: '/auth/authorize',
-        token_endpoint: '/auth/token'
+        authorization_endpoint: File.join(ISSUER, '/auth/authorize'),
+        token_endpoint: File.join(ISSUER, '/auth/token')
       }.merge(attributes)
       super attributes_with_default
     end
@@ -40,8 +41,11 @@ module AppleID
     def handle_success_response(response)
       token_hash = JSON.parse(response.body).with_indifferent_access
       AccessToken.new token_hash.delete(:access_token), token_hash
-    rescue JSON::ParserError
-      raise Exception.new("Unknown Token Type")
+    end
+
+    def handle_error_response(response)
+      error = JSON.parse(response.body).with_indifferent_access
+      raise Error.new(response.status, error)
     end
   end
 end
