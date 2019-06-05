@@ -2,6 +2,8 @@ module AppleID
   class IdToken < OpenIDConnect::ResponseObject::IdToken
     class VerificationFailed < StandardError; end
 
+    alias_method :original_jwt, :raw_attributes
+
     def verify!(expected_client, access_token: nil, code: nil, verify_signature: true)
       verify_signature! if verify_signature
       verify_claims! expected_client, access_token, code
@@ -24,7 +26,7 @@ module AppleID
     end
 
     def verify_signature!
-      raw_attributes.verify! jwks
+      original_jwt.verify! jwks
     rescue
       raise VerificationFailed, 'Signature Verification Failed'
     end

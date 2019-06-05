@@ -14,6 +14,8 @@ RSpec.describe AppleID::IdToken do
   end
   let(:id_token) { AppleID::IdToken.decode(id_token_str) }
 
+  its(:original_jwt) { should be_a JSON::JWS }
+
   describe '.decode' do
     it { should be_a AppleID::IdToken }
 
