@@ -2,6 +2,7 @@ require 'openid_connect'
 
 module AppleID
   ISSUER = 'https://appleid.apple.com'
+  JWKS_URI = 'https://appleid.apple.com/auth/keys'
 
   VERSION = ::File.read(
     ::File.join(::File.dirname(__FILE__), '../VERSION')
@@ -51,3 +52,5 @@ module AppleID
 end
 
 require 'apple_id/client'
+require 'apple_id/access_token'
+require 'apple_id/id_token'
