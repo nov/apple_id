@@ -63,7 +63,11 @@ response = client.access_token!
 response.id_token.verify!(
   client,
   access_token: response.access_token,
-  verify_signature: false # NOTE: when verifying signature, one http request to Apple's JWKs are required.
+
+  # NOTE:
+  #  When verifying signature, one http request to Apple's JWKs are required.
+  #  You can skip ID Token signature verification when you got the token directly from the token endpoint in TLS channel.
+  verify_signature: false
 )
 puts response.id_token.sub # => OpenID Connect Subject Identifier (= Apple User ID)
 puts response.id_token.original_jwt.pretty_generate
