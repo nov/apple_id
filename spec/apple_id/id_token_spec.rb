@@ -89,6 +89,28 @@ RSpec.describe AppleID::IdToken do
           end
         end.to raise_error AppleID::IdToken::VerificationFailed, 'Claims Verification Failed at [:aud, :nonce, :s_hash, :at_hash, :c_hash]'
       end
+
+      context 'when future token given' do
+        it do
+          expect do
+            travel_to(Time.at id_token.iat - 1) do
+              id_token.verify!(
+                verify_signature: false
+              )
+            end
+          end.to raise_error AppleID::IdToken::VerificationFailed, 'Claims Verification Failed at [:iat]'
+        end
+      end
+
+      context 'when expired token given' do
+        it do
+          expect do
+            id_token.verify!(
+              verify_signature: false
+            )
+          end.to raise_error AppleID::IdToken::VerificationFailed, 'Claims Verification Failed at [:exp]'
+        end
+      end
     end
 
     context 'when signature is invalid' do
