@@ -52,11 +52,23 @@ RSpec.describe AppleID::IdToken do
       )
     end
 
+    context 'when no expected claims given' do
+      it do
+        expect do
+          mock_json :get, AppleID::JWKS_URI, 'jwks' do
+            travel_to(Time.at id_token.iat) do
+              id_token.verify!
+            end
+          end
+        end.not_to raise_error
+      end
+    end
+
     context 'when claims are valid' do
       it do
         expect do
           travel_to(Time.at id_token.iat) do
-            id_token.verify! expected_client, verify_signature: false
+            id_token.verify! client: expected_client, verify_signature: false
           end
         end.not_to raise_error
       end
@@ -66,9 +78,16 @@ RSpec.describe AppleID::IdToken do
       it do
         expect do
           travel_to(Time.at id_token.iat) do
-            id_token.verify! unexpected_client, verify_signature: false
+            id_token.verify!(
+              client: unexpected_client,
+              nonce: 'invalid',
+              state: 'invalid',
+              access_token: 'invalid',
+              code: 'invalid',
+              verify_signature: false
+            )
           end
-        end.to raise_error AppleID::IdToken::VerificationFailed, 'Claims Verification Failed'
+        end.to raise_error AppleID::IdToken::VerificationFailed, 'Claims Verification Failed at [:aud, :nonce, :s_hash, :at_hash, :c_hash]'
       end
     end
 
@@ -81,7 +100,7 @@ RSpec.describe AppleID::IdToken do
         it do
           expect do
             travel_to(Time.at id_token.iat) do
-              id_token.verify! expected_client, verify_signature: false
+              id_token.verify! client: expected_client, verify_signature: false
             end
           end.not_to raise_error
         end
@@ -92,7 +111,7 @@ RSpec.describe AppleID::IdToken do
           expect do
             mock_json :get, AppleID::JWKS_URI, 'jwks' do
               travel_to(Time.at id_token.iat) do
-                id_token.verify! expected_client
+                id_token.verify! client: expected_client
               end
             end
           end.to raise_error AppleID::IdToken::VerificationFailed, 'Signature Verification Failed'
