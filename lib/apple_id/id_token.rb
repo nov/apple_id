@@ -2,6 +2,7 @@ module AppleID
   class IdToken < OpenIDConnect::ResponseObject::IdToken
     class VerificationFailed < StandardError; end
 
+    attr_accessor :original_jwt_string
     alias_method :original_jwt, :raw_attributes
 
     def verify!(verify_signature: true, client: nil, nonce: nil, state: nil, access_token: nil, code: nil)
@@ -12,7 +13,9 @@ module AppleID
 
     class << self
       def decode(jwt_string)
-        super jwt_string, :skip_verification
+        id_token = super jwt_string, :skip_verification
+        id_token.original_jwt_string = jwt_string
+        id_token
       end
     end
 
