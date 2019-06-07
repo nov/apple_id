@@ -5,6 +5,9 @@ module AppleID
     attr_accessor :original_jwt_string
     alias_method :original_jwt, :raw_attributes
 
+    # NOTE:
+    #  Apple doesn't support nonce, c_hash and s_hash right now.
+    #  Don't pass nonce, code and access_token until they support them.
     def verify!(verify_signature: true, client: nil, nonce: nil, state: nil, access_token: nil, code: nil)
       verify_signature! if verify_signature
       verify_claims! client, nonce, state, access_token, code
