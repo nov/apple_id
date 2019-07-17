@@ -2,6 +2,7 @@ module AppleID
   class IdToken < OpenIDConnect::ResponseObject::IdToken
     class VerificationFailed < StandardError; end
 
+    attr_optional :email
     attr_accessor :original_jwt_string
     alias_method :original_jwt, :raw_attributes
 
