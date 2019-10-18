@@ -26,8 +26,12 @@ RSpec.describe AppleID::Client do
       }.reject do |k,v|
         v.blank?
       end
-      query = URI.parse(client.authorization_uri params).query
-      Rack::Utils.parse_query(query).with_indifferent_access
+      URI.parse(client.authorization_uri params).
+        query.
+        split('&').
+        map { |param| param.split('=') }.
+        to_h.
+        with_indifferent_access
     end
 
     describe 'scope' do
@@ -37,6 +41,38 @@ RSpec.describe AppleID::Client do
 
       context 'as default' do
         it { should == nil }
+      end
+
+      describe 'String type' do
+        context 'single scope' do
+          let(:scope) { 'email' }
+
+          it { should == 'email' }
+        end
+
+        context 'multiple scopes' do
+          let(:scope) { 'email name' }
+
+          it 'url encodes space character' do
+            should == 'email%20name'
+          end
+        end
+      end
+
+      describe 'Array type' do
+        context 'single scope' do
+          let(:scope) { [:email] }
+
+          it { should == 'email' }
+        end
+
+        context 'multiple scopes' do
+          let(:scope) { [:email, :name] }
+
+          it 'url encodes space character' do
+            should == 'email%20name'
+          end
+        end
       end
     end
   end

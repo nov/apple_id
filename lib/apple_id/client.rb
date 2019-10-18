@@ -17,6 +17,21 @@ module AppleID
       super :body, options
     end
 
+    def authorization_uri(params = {})
+      # NOTE:
+      # Apple keychain (native window) does not support space encoding
+      # with '+' in url params. We have to use '%20' otherwise multiple
+      # scopes will be ignored. (no email / name will be returned)
+      uri = super(params.except(:scope))
+      if params[:scope]
+        scope_as_string = Array(params[:scope]).join(' ')
+        scope_param = "&scope=#{URI.encode(scope_as_string)}"
+        uri << scope_param
+      end
+
+      uri
+    end
+
     private
 
     def client_secret_jwt
