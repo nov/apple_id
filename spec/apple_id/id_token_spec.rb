@@ -3,6 +3,9 @@ RSpec.describe AppleID::IdToken do
   let(:signature_base_string) do
     'eyJraWQiOiJBSURPUEsxIiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJodHRwczovL2FwcGxlaWQuYXBwbGUuY29tIiwiYXVkIjoianAueWF1dGguc2lnbmluLnNlcnZpY2UyIiwiZXhwIjoxNTU5NzA5ODkwLCJpYXQiOjE1NTk3MDkyOTAsInN1YiI6IjAwMDcyMy4yNWRhOGJlMzMyOTY0OTkxODk4NjMwOTQ3MjAyZmVmMC4wNDAyIiwiYXRfaGFzaCI6InpqUmlUN2QzVHFRNVM3cEZkbzZxWGcifQ'
   end
+  let(:signature_base_string_with_more_claims) do
+    'eyJraWQiOiI4NkQ4OEtmIiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJodHRwczovL2FwcGxlaWQuYXBwbGUuY29tIiwiYXVkIjoianAueWF1dGguc2lnbmluLnNlcnZpY2UzIiwiZXhwIjoxNTg1MTE2NzMyLCJpYXQiOjE1ODUxMTYxMzIsInN1YiI6IjAwMDcyMy4yNWRhOGJlMzMyOTY0OTkxODk4NjMwOTQ3MjAyZmVmMC4wNDAyIiwibm9uY2UiOiI4MDliMzFmM2E4ZDQxOTMwIiwiY19oYXNoIjoiY0JvOXREYkRZOWlrYTFXNlZmTzBCdyIsImVtYWlsIjoiZm9vYmFyQHByaXZhdGVyZWxheS5hcHBsZWlkLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjoidHJ1ZSIsImlzX3ByaXZhdGVfZW1haWwiOiJ0cnVlIiwiYXV0aF90aW1lIjoxNTg1MTE2MTMyLCJub25jZV9zdXBwb3J0ZWQiOnRydWV9'
+  end
   let(:signature) do
     'jDV-AVFM-Yx_lxc-hsJNF2mgD2PoRlQ8SJjharKom87pIKR1frQfaY_apO-AxyDrhvB3qOdfhZql08EHBHNWATlX3l6sAKL-bUPH6bzHxIZTWHZ9IOimPyvTOJNFyJWLsm6lGcqemKB1UQG2MQ06lI9qc6C6T8_obv2HPJ-Sm8OBE9z-CDyKGcFZ-R8b2Ut6TibmRyQ-kmB7na6ay9kGXm56I_TeA2QCMJGKH_X8C2M7kBPsO_WrYuogA3tnWLT8wi0TPD5zKnnBH0bXLgjeyE2lYRgboQttX6WqTdR0dN-mLi8ShTPEGUCkC7_jFJH9XpC7LfCeKl9tD3qzC_Dx1Q'
   end
@@ -16,6 +19,19 @@ RSpec.describe AppleID::IdToken do
 
   its(:original_jwt) { should == JSON::JWT.decode(id_token_str, :skip_verification) }
   its(:original_jwt_string) { should == id_token_str }
+
+  [:email_verified, :is_private_email, :nonce_supported].each do |boolean_claim|
+    describe boolean_claim do
+      context 'when claim is missing' do
+        its(:"#{boolean_claim}?") { should == false  }
+      end
+
+      context 'when claim is given' do
+        let(:signature_base_string) { signature_base_string_with_more_claims }
+        its(:"#{boolean_claim}?") { should == true  }
+      end
+    end
+  end
 
   describe '.decode' do
     it { should be_a AppleID::IdToken }
@@ -88,7 +104,7 @@ RSpec.describe AppleID::IdToken do
               verify_signature: false
             )
           end
-        end.to raise_error AppleID::IdToken::VerificationFailed, 'Claims Verification Failed at [:aud, :nonce, :s_hash, :at_hash, :c_hash]'
+        end.to raise_error AppleID::IdToken::VerificationFailed, 'Claims Verification Failed at [:aud, :s_hash, :at_hash, :c_hash]'
       end
 
       context 'when issuer is invalid' do
@@ -154,6 +170,29 @@ RSpec.describe AppleID::IdToken do
               end
             end
           end.to raise_error AppleID::IdToken::VerificationFailed, 'Signature Verification Failed'
+        end
+      end
+    end
+
+    context 'when nonce is invalid' do
+      context 'when nonce is supported' do
+        let(:signature_base_string) { signature_base_string_with_more_claims }
+        it do
+          expect do
+            travel_to(Time.at id_token.iat) do
+              id_token.verify! nonce: 'expected', verify_signature: false
+            end
+          end.to raise_error AppleID::IdToken::VerificationFailed, 'Claims Verification Failed at [:nonce]'
+        end
+      end
+
+      context 'when nonce is not supported' do
+        it do
+          expect do
+            travel_to(Time.at id_token.iat) do
+              id_token.verify! nonce: 'expected', verify_signature: false
+            end
+          end.not_to raise_error
         end
       end
     end

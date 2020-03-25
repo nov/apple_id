@@ -2,13 +2,22 @@ module AppleID
   class IdToken < OpenIDConnect::ResponseObject::IdToken
     class VerificationFailed < StandardError; end
 
-    attr_optional :email
+    attr_optional :email, :email_verified, :is_private_email, :nonce_supported
     attr_accessor :original_jwt_string
     alias_method :original_jwt, :raw_attributes
 
-    # NOTE:
-    #  Apple doesn't support nonce, c_hash and s_hash right now.
-    #  Don't pass nonce, code and access_token until they support them.
+    [:email_verified, :is_private_email, :nonce_supported].each do |boolean_claim|
+      define_method :"#{boolean_claim}?" do
+        claim_value = send(boolean_claim)
+        case claim_value
+        when String
+          claim_value == 'true'
+        else
+          !!claim_value
+        end
+      end
+    end
+
     def verify!(verify_signature: true, client: nil, nonce: nil, state: nil, access_token: nil, code: nil)
       verify_signature! if verify_signature
       verify_claims! client, nonce, state, access_token, code
@@ -63,8 +72,12 @@ module AppleID
       if aud.present? && self.aud != aud
         failure_reasons << :aud
       end
-      if nonce.present? && self.nonce != nonce
-        failure_reasons << :nonce
+      if !nonce_supported? && self.nonce.blank?
+        AppleID.logger.warn 'nonce is\'nt supported on this platform'
+      else
+        if nonce.present? && self.nonce != nonce
+          failure_reasons << :nonce
+        end
       end
       if s_hash.present? && self.s_hash != s_hash
         failure_reasons << :s_hash
