@@ -34,15 +34,8 @@ module AppleID
 
     private
 
-    def jwks
-      @jwks ||= JSON.parse(
-        OpenIDConnect.http_client.get_content(JWKS_URI)
-      ).with_indifferent_access
-      JSON::JWK::Set.new @jwks[:keys]
-    end
-
     def verify_signature!
-      original_jwt.verify! jwks
+      original_jwt.verify! AppleID::JWKS.fetch(original_jwt.kid)
     rescue
       raise VerificationFailed, 'Signature Verification Failed'
     end

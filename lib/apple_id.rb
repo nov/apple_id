@@ -54,3 +54,4 @@ end
 require 'apple_id/client'
 require 'apple_id/access_token'
 require 'apple_id/id_token'
+require 'apple_id/jwks'
