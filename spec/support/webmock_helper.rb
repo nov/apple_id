@@ -10,6 +10,13 @@ module WebMockHelper
     result
   end
 
+  def request_to(endpoint, method = :get)
+    raise_error(WebMock::NetConnectNotAllowedError) { |e|
+      e.message.should include("Unregistered request: #{method.to_s.upcase}")
+      e.message.should include(endpoint)
+    }
+  end
+
   private
 
   def response_for(response_file, options = {})
