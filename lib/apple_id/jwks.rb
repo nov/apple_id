@@ -1,5 +1,5 @@
 module AppleID
-  class JWKS
+  class JWKS < JSON::JWK::Set
     class Cache
       def fetch(cache_key)
         yield
@@ -16,7 +16,7 @@ module AppleID
 
     def self.fetch(cache_key)
       jwks = cache.fetch("apple_id:jwks:#{cache_key}") do
-        JSON::JWK::Set.new(
+        new(
           JSON.parse(
             OpenIDConnect.http_client.get_content(JWKS_URI)
           ).with_indifferent_access[:keys]
