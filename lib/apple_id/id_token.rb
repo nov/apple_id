@@ -35,7 +35,7 @@ module AppleID
     private
 
     def verify_signature!
-      original_jwt.verify! AppleID::JWKS.fetch(original_jwt.kid)
+      original_jwt.verify! JWKS.fetch(original_jwt.kid)
     rescue
       raise VerificationFailed, 'Signature Verification Failed'
     end
