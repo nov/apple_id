@@ -11,7 +11,8 @@ module WebMockHelper
   end
 
   def request_to(endpoint, method = :get)
-    raise_error(WebMock::NetConnectNotAllowedError) { |e|
+    raise_error { |e|
+      e.should be_instance_of WebMock::NetConnectNotAllowedError
       e.message.should include("Unregistered request: #{method.to_s.upcase}")
       e.message.should include(endpoint)
     }
