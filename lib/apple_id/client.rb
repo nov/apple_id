@@ -40,7 +40,7 @@ module AppleID
 
     def handle_success_response(response)
       token_hash = JSON.parse(response.body).with_indifferent_access
-      AccessToken.new token_hash.delete(:access_token), token_hash
+      AccessToken.new token_hash.delete(:access_token), token_hash.merge(client: self)
     end
 
     def handle_error_response(response)

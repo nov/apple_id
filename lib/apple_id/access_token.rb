@@ -1,6 +1,7 @@
 module AppleID
   class AccessToken < OpenIDConnect::AccessToken
     undef_required_attributes :client
+    attr_optional :client
 
     def initialize(access_token, attributes = {})
       super attributes.merge(access_token: access_token)
