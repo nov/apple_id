@@ -2,7 +2,7 @@ module AppleID
   class IdToken < OpenIDConnect::ResponseObject::IdToken
     class VerificationFailed < StandardError; end
 
-    attr_optional :email, :email_verified, :is_private_email, :nonce_supported
+    attr_optional :email, :email_verified, :is_private_email, :nonce_supported, :real_user_status
     attr_accessor :original_jwt_string
     alias_method :original_jwt, :raw_attributes
 
@@ -15,6 +15,13 @@ module AppleID
         else
           !!claim_value
         end
+      end
+    end
+
+    def initialize(attributes = {})
+      super
+      unless self.real_user_status.nil?
+        self.real_user_status = RealUserStatus.new(self.real_user_status)
       end
     end
 

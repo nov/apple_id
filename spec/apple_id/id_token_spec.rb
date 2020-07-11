@@ -51,6 +51,29 @@ RSpec.describe AppleID::IdToken do
     end
   end
 
+  describe '#new' do
+    subject do
+      AppleID::IdToken.new(claims)
+    end
+    let(:required_claims) do
+      {iss: 'iss', sub: 'sub', aud: 'aud', exp: Time.now, iat: Time.now}
+    end
+
+    context 'when real_user_status given' do
+      let(:claims) do
+        required_claims.merge(real_user_status: 2)
+      end
+      its(:real_user_status) { should be_instance_of AppleID::IdToken::RealUserStatus }
+    end
+
+    context 'otherwise' do
+      let(:claims) do
+        required_claims
+      end
+      its(:real_user_status) { should be_nil }
+    end
+  end
+
   describe '#verify!' do
     let(:expected_client) do
       AppleID::Client.new(
