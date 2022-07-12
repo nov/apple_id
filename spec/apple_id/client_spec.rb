@@ -73,4 +73,23 @@ RSpec.describe AppleID::Client do
       end
     end
   end
+
+  describe '#revoke!' do
+    context 'when target token givne' do
+      it do
+        mock_json :post, client.revocation_endpoint, 'revocation/success', status: 200 do
+          client.refresh_token = 'refresh_token'
+          client.revoke!.should == :success
+        end
+      end
+    end
+
+    context 'otherwise' do
+      it do
+        expect do
+          client.revoke!
+        end.to raise_error AttrRequired::AttrMissing
+      end
+    end
+  end
 end
