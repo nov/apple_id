@@ -2,19 +2,18 @@ module AppleID
   class EventToken < OpenIDConnect::ConnectObject
     class VerificationFailed < Error; end
 
-    # NOTE: Apple uses `events` for the JWT key, but this gem uses `event` since it's always a single JSON Object.
-    #       Once they start returning an array of events, this gem might use `events` as the attribute name.
-    attr_required :iss, :aud, :exp, :iat, :jti, :event
+    attr_required :iss, :aud, :exp, :iat, :jti, :events
     alias_method :original_jwt, :raw_attributes
+    alias_method :event, :events
 
     def initialize(attributes = {})
       super
-      @event = Event.decode attributes[:events]
+      @events = Event.decode attributes[:events]
     end
 
     def verify!(verify_signature: true, client: nil)
       verify_signature! if verify_signature
-      verify_claims! client, nonce, state, access_token, code
+      verify_claims! client
       self
     end
 
@@ -32,7 +31,7 @@ module AppleID
       raise VerificationFailed, 'Signature Verification Failed'
     end
 
-    def verify_claims!(client, nonce, state, access_token, code)
+    def verify_claims!(client)
       aud = if client.respond_to?(:identifier)
         client.identifier
       else
