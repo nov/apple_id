@@ -7,12 +7,18 @@ module AppleID
     def initialize(attributes)
       attributes_with_default = {
         authorization_endpoint: File.join(ISSUER, '/auth/authorize'),
-        token_endpoint: File.join(ISSUER, '/auth/token')
+        token_endpoint:         File.join(ISSUER, '/auth/token'),
+        revocation_endpoint:    File.join(ISSUER, '/auth/revoke'),
       }.merge(attributes)
       super attributes_with_default
     end
 
     def access_token!(options = {})
+      self.secret = client_secret_jwt
+      super :body, options
+    end
+
+    def revoke!(options = {})
       self.secret = client_secret_jwt
       super :body, options
     end
