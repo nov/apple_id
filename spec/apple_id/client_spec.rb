@@ -88,7 +88,7 @@ RSpec.describe AppleID::Client do
       it do
         expect do
           client.revoke!
-        end.to raise_error AttrRequired::AttrMissing
+        end.to raise_error ArgumentError
       end
     end
   end
