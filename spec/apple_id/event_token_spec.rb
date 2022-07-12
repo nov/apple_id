@@ -173,7 +173,5 @@ RSpec.describe AppleID::EventToken do
         end
       end
     end
-
-
   end
 end
