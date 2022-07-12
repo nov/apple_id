@@ -8,6 +8,8 @@ module AppleID
     ::File.join(::File.dirname(__FILE__), '../VERSION')
   ).chomp
 
+  class Error < StandardError; end
+
   def self.logger
     @@logger
   end
@@ -56,4 +58,6 @@ require 'apple_id/access_token'
 require 'apple_id/id_token'
 require 'apple_id/id_token/real_user_status'
 require 'apple_id/jwks'
+require 'apple_id/event_token'
+require 'apple_id/event_token/event'
 require 'apple_id/api/user_migration'
