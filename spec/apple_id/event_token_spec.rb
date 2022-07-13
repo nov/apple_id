@@ -44,7 +44,7 @@ RSpec.describe AppleID::EventToken do
       its(attr) { should be_instance_of AppleID::EventToken::Event }
       describe attr do
         subject { event_token.send attr }
-        its(:type) { should == 'consent-revoked' }
+        its(:type) { should == AppleID::EventToken::Event::Type::CONSENT_REVOKED }
         its(:sub) { should == '000768.6166f031167141e695698239959f591a.1521' }
         its(:event_time) { should == 1657617063012 }
       end
