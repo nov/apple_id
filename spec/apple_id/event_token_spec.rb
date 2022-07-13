@@ -40,6 +40,17 @@ RSpec.describe AppleID::EventToken do
     its(:exp) { should == exp }
     its(:iat) { should == iat }
     its(:jti) { should == jti }
+
+    describe 'delegation' do
+      its(:type) { should == AppleID::EventToken::Event::Type::CONSENT_REVOKED }
+      its(:sub) { should == '000768.6166f031167141e695698239959f591a.1521' }
+      its(:event_time) { should == 1657617063012 }
+      its(:email_enabled?) { should be_falsy }
+      its(:email_disabled?) { should be_falsy }
+      its(:consent_revoked?) { should be_truthy }
+      its(:account_deleted?) { should be_falsy }
+    end
+
     [:event, :events].each do |attr|
       its(attr) { should be_instance_of AppleID::EventToken::Event }
       describe attr do

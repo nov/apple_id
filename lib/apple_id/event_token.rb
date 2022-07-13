@@ -6,6 +6,8 @@ module AppleID
     alias_method :original_jwt, :raw_attributes
     alias_method :event, :events
 
+    delegate :type, :sub, :event_time, :email_enabled?, :email_disabled?, :consent_revoked?, :account_deleted?, to: :event
+
     def initialize(attributes = {})
       super
       @events = Event.decode attributes[:events]
