@@ -124,6 +124,12 @@ RSpec.describe AppleID::EventToken do
     context 'without signature verification' do
       subject { event_token.verify! verify_signature: false }
 
+      around do |example|
+        travel_to(Time.at event_token.iat) do
+          example.run
+        end
+      end
+
       context 'when iss invalid' do
         let(:iss) { 'invalid' }
 
