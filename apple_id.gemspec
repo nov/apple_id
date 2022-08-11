@@ -18,6 +18,7 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
+  spec.add_runtime_dependency 'json-jwt', '~> 1.15.0'
   spec.add_runtime_dependency 'rack-oauth2', '~> 1.21.2'
   spec.add_runtime_dependency 'openid_connect', '~> 1.3.0'
   spec.add_development_dependency 'bundler'

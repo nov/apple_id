@@ -2,8 +2,8 @@ RSpec.describe AppleID::JWKS do
   class CustomCache
     def fetch(kid)
       case kid
-      when 'apple_id:jwks:known'
-        File.new(File.join(File.dirname(__FILE__), '../mock_response/jwks.json'))
+      when 'json:jwk:set:f36d9dc4ef8c2f4824f813d6e568e35f:AIDOPK1'
+        File.read(File.join(File.dirname(__FILE__), '../mock_response/jwks.json'))
       else
         yield
       end
@@ -14,12 +14,16 @@ RSpec.describe AppleID::JWKS do
     subject { AppleID::JWKS.cache }
 
     context 'as default' do
-      it { should be_instance_of AppleID::JWKS::Cache }
+      it { should be_instance_of JSON::JWK::Set::Fetcher::Cache }
     end
 
     context 'when specified' do
-      before { AppleID::JWKS.cache = CustomCache.new }
-      after { AppleID::JWKS.cache = AppleID::JWKS::Cache.new }
+      around do |example|
+        original = AppleID::JWKS.cache
+        AppleID::JWKS.cache = CustomCache.new
+        example.run
+        AppleID::JWKS.cache = original
+      end
       it { should be_instance_of CustomCache }
     end
   end
@@ -27,8 +31,12 @@ RSpec.describe AppleID::JWKS do
   describe '.fetch' do
     subject { AppleID::JWKS.fetch kid }
 
-    before { AppleID::JWKS.cache = CustomCache.new }
-    after { AppleID::JWKS.cache = AppleID::JWKS::Cache.new }
+    around do |example|
+      original = AppleID::JWKS.cache
+      AppleID::JWKS.cache = CustomCache.new
+      example.run
+      AppleID::JWKS.cache = original
+    end
 
     context 'when unknown' do
       let(:kid) { 'unknown' }
@@ -40,7 +48,7 @@ RSpec.describe AppleID::JWKS do
     end
 
     context 'when known' do
-      let(:kid) { 'known' }
+      let(:kid) { 'AIDOPK1' }
       it "should not request to #{AppleID::JWKS_URI}" do
         expect do
           subject
