@@ -1,11 +1,52 @@
 RSpec.describe AppleID::EventToken::Event do
   subject { event }
   let(:event) do
-    AppleID::EventToken::Event.new(
+    AppleID::EventToken::Event.new attributes
+  end
+  let(:required_attributes) do
+    {
       type: type,
       sub: SecureRandom.uuid,
       event_time: Time.now.to_i
-    )
+    }
+  end
+  let(:attributes) { required_attributes }
+
+  context 'when email & is_private_email is given' do
+    let(:type) { 'email-enabled' }
+    let(:email) { "#{SecureRandom.hex(8)}@privaterelay.appleid.com" }
+    let(:is_private_email) { 'true' }
+    let(:attributes) do
+      required_attributes.merge(
+        email: email,
+        is_private_email: is_private_email
+      )
+    end
+    its(:email) { should == email }
+
+    context 'when is_private_email == true' do
+      let(:is_private_email) { true }
+      its(:is_private_email) { should == true }
+      its(:is_private_email?) { should be_truthy }
+    end
+
+    context 'when is_private_email == false' do
+      let(:is_private_email) { false }
+      its(:is_private_email) { should == false }
+      its(:is_private_email?) { should be_falsy }
+    end
+
+    context 'when is_private_email == "true"' do
+      let(:is_private_email) { 'true' }
+      its(:is_private_email) { should == 'true' }
+      its(:is_private_email?) { should be_truthy }
+    end
+
+    context 'when is_private_email == "false"' do
+      let(:is_private_email) { 'false' }
+      its(:is_private_email) { should == 'false' }
+      its(:is_private_email?) { should be_falsy }
+    end
   end
 
   context 'when type=email-enabled' do
