@@ -7,8 +7,8 @@ module AppleID
       JSON::JWK::Set::Fetcher.cache
     end
 
-    def self.fetch(kid)
-      JSON::JWK::Set::Fetcher.fetch JWKS_URI, kid: kid
+    def self.fetch(kid, options = {})
+      JSON::JWK::Set::Fetcher.fetch JWKS_URI, kid: kid, **options
     end
   end
 end

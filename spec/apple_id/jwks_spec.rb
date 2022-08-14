@@ -1,6 +1,6 @@
 RSpec.describe AppleID::JWKS do
   class CustomCache
-    def fetch(kid)
+    def fetch(kid, options = {})
       case kid
       when 'json:jwk:set:f36d9dc4ef8c2f4824f813d6e568e35f:AIDOPK1'
         File.read(File.join(File.dirname(__FILE__), '../mock_response/jwks.json'))
