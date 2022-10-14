@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [1.6.1] - 2022-10-14
+
+### Fixed
+
+- fix json response handling https://github.com/nov/apple_id/commit/3b6199b56de2eda0b35fcb13a76438916961ba47
+
+
 ## [1.6.0] - 2022-10-09
 
 ### Added
