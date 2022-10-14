@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [1.6.2] - 2022-10-14
+
+### Fixed
+
+- stringify jwt secret, faraday does not do so automatically  https://github.com/nov/apple_id/commit/660ba5f8036279b111abc75a2708b945d4ab0be9
+
 ## [1.6.1] - 2022-10-14
 
 ### Fixed
