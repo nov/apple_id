@@ -34,7 +34,7 @@ module AppleID
         exp: 1.minutes.from_now
       )
       jwt.kid = key_id
-      jwt.sign(private_key)
+      jwt.sign(private_key).to_s
     end
 
     def setup_required_scope(scopes)
