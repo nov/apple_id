@@ -52,6 +52,8 @@ module AppleID
     def handle_error_response(response)
       error = response.body.with_indifferent_access
       raise Error.new(response.status, error)
+    rescue Faraday::ParsingError, NoMethodError
+      raise Error.new(response.status, error: 'Unknown', error_description: response.body)
     end
   end
 end
