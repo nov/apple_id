@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [1.6.2] - 2022-10-20
+
+### Fixed
+
+- rescue un-parsable / non-hash error response  https://github.com/nov/apple_id/commit/75a35e9d15fa2af299237ceb3b71def819e9cc03
+
 ## [1.6.2] - 2022-10-14
 
 ### Fixed
